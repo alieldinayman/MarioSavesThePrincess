@@ -1,5 +1,5 @@
-from Grid import Grid
-from Node import *
+from grid import Grid
+from node import *
 
 
 class GridInitializer:

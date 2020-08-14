@@ -1,4 +1,4 @@
-from Node import NodeState
+from node import NodeState
 
 
 class Grid:

@@ -1,8 +1,8 @@
-from GridInitializer import *
-from GridSolver import *
+from grid_initializer import *
+from grid_solver import *
 import sys
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     grid_initializer = GridInitializer()
     grid, error_flag = grid_initializer.populate_grid()
 
