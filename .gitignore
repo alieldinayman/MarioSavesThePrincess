@@ -6,6 +6,9 @@ __pycache__/
 # intellij configs
 .idea/
 
+# library root
+MarioSavesPrincess/
+
 # C extensions
 *.so
 
