@@ -1,12 +1,23 @@
 from node import NodeState
+from grid_initializer import GridInitializer
 
 
 class GridSolver:
-    def __init__(self, grid, show_costs):
-        self.grid = grid
+    def __init__(self):
+        self.grid = None
         self.open = []
         self.closed = []
-        self.show_costs = show_costs
+        self.show_costs = False
+
+    def solve_grid(self, n, data):
+        grid_initializer = GridInitializer(n)
+        self.grid, error_flag = grid_initializer.populate_grid(data)
+
+        if error_flag is True:
+            return None, True
+
+        else:
+            return self.traverse_grid()
 
     def traverse_grid(self):
         # Seed the solver's open list with the start node

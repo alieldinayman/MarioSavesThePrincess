@@ -3,41 +3,32 @@ from node import *
 
 
 class GridInitializer:
-    def __init__(self):
+    def __init__(self, n):
         self.grid = Grid()
-        self.error_flag = False
-        self.paths = []
+        self.grid.size = n
 
-    def populate_grid(self):
-        try:
-            n = int(input("Please insert your grid size (n): "))
+    def populate_grid(self, data):
+        if len(data) != self.grid.size:
+            return None, True
 
-        except ValueError:
-            print("Please enter a valid number.")
-            self.populate_grid()
+        for i in range(self.grid.size):
+            row = data[i]
+            row_nodes = []
 
-        else:
-            self.grid.size = n
-            print("Please insert your grid row by row separating each node by a space: ")
+            if len(row) != self.grid.size:
+                return None, True
 
-            for i in range(n):
-                row = input().split()
-                row_nodes = []
+            for j in range(self.grid.size):
+                node, error_flag = self.initialize_node([i, j], row[j])
 
-                if len(row) != n:
-                    return None, True
+                if error_flag is True:
+                    return None, error_flag
 
-                for j in range(n):
-                    node, error_flag = self.initialize_node([i, j], row[j])
+                row_nodes.append(node)
 
-                    if error_flag is True:
-                        return None, error_flag
+            self.grid.data.append(row_nodes)
 
-                    row_nodes.append(node)
-
-                self.grid.data.append(row_nodes)
-
-            return self.grid, False
+        return self.grid, False
 
     def initialize_node(self, coordinates, symbol):
         if symbol == '-':
@@ -63,7 +54,6 @@ class GridInitializer:
                 return None, True
 
         else:
-            print("Invalid symbol")
             return None, True
 
         return node, False
