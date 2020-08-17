@@ -20,68 +20,57 @@ app.layout = html.Div(children=[
     html.H3(children="Grid Size", style={"display": "flex", "align-items": "center", "justify-content": "center"}),
     dcc.Slider(id="size-slider", marks={i: '{}'.format(i) for i in range(51)}, min=2, max=50, value=2),
     html.Br(),
-    html.Div(id="grid", children=[])
+    html.Div(html.Button("Solve", id="solve-btn"), style={"display": "flex", "align-items": "center", "justify-content": "center"}),
+    html.H2(id="solution", children="Solution: "),
+    html.Div(id="hidden-div", style={"display": "none"})
 ])
 
 # TODO: Turn these into client-side callbacks to reduce overhead on server
-# Bind a callback to any dynamically created nodes/buttons
-# app.clientside_callback(
-#     """
-#     function(size, data) {
-#         var grid = []
-#         for (i = 0; i < size; i++) {
-#             var row = []
-#             for (j = 0; j < size; i++) {
-#                 row.push(html.Button(children="-", id={"type": "dynamic-node", "index": str(i) + "," + str(j)}, n_clicks=0))
-#             }
-#             grid.push(html.Div(children=row, style={"display": "flex", "align-items": "center", "justify-content": "center"}))
-#         }
-#         return grid
-#     }
-#     """,
-#     Output(component_id="grid", component_property="children"),
-#     [Input(component_id="size-slider", component_property="value")]
-# )
-
-
-node_pool = []
-for i in range(50):
-    row = []
-    for j in range(50):
-        row.append(html.Button(children="-", id={"type": "dynamic-node", "index": str(i) + "," + str(j)}, n_clicks=0))
-    node_pool.append(row)
-
-@app.callback(Output("grid", "children"),
-              [Input("size-slider", "value")])
-def update_grid(size):
-    grid = []
-    for x in range(size):
-        row = []
-        for y in range(size):
-            row.append(node_pool[x][y])
-
-        grid.append(html.Div(children=row, style={"display": "flex", "align-items": "center", "justify-content": "center"}))
-
-    return grid
-
-
-# Bind a callback to any dynamically created nodes/buttons
+# Bind a client-side callback to the Slider to dynamically create nodes/buttons
 app.clientside_callback(
     """
-    function(n_clicks) {
-        node_states = ["-", "x", "m", "p"]
-        return node_states[n_clicks % node_states.length]
+    function(size, data) {
+        grid = document.getElementById("grid");
+        if(grid != null) {
+            grid.remove();
+        }
+        
+        var div = document.createElement("div");
+        div.id = "grid"
+        div.align = "center";
+        
+        for (var i = 0; i < size ; i++) {
+            for(var j = 0; j < size; j++) {
+                var elem = document.createElement("input");
+                elem.id = "node_" + i + "_" + j;
+                elem.index = "node_" + i + "_" + j;
+                elem.type = "button";
+                elem.value = "-";
+                elem.onclick = function() {
+                    if(this.value == "-") this.value = "x";
+                    else if (this.value == "x") this.value = "m"
+                    else if (this.value == "m") this.value = "p"
+                    else if (this.value == "p") this.value = "-"
+                }
+
+                div.appendChild(elem);
+            }
+            var br = document.createElement('br');
+            div.appendChild(br);
+        }
+        
+        document.body.appendChild(div);
     }
     """,
-    Output(component_id={"type": "dynamic-node", "index": MATCH}, component_property="children"),
-    [Input(component_id={"type": "dynamic-node", "index": MATCH}, component_property="n_clicks")]
+    Output(component_id="hidden-div", component_property="children"),
+    [Input(component_id="size-slider", component_property="value")]
 )
 
 # @app.callback(
-#     Output(component_id={"type": "dynamic-node", "index": MATCH}, component_property="children"),
-#     [Input(component_id={"type": "dynamic-node", "index": MATCH}, component_property="n_clicks")])
-# def update_node(n_clicks):
-#     return node_states[n_clicks % len(node_states)]
+#     Output(component_id="solution", component_property="children"),
+#     [Input(component_id="solve-btn", component_property="n_clicks")])
+# def solve(n_clicks):
+#     return solve_grid()
 
 
 # Initialize the SQLite Database
