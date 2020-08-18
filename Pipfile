@@ -11,6 +11,7 @@ flask-sqlalchemy = "*"
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
 dash = "==1.14.0"
+requests = "*"
 
 [requires]
 python_version = "3.8"

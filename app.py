@@ -4,7 +4,8 @@ from flask_marshmallow import Marshmallow
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output, State, ALL, MATCH
+from dash.dependencies import Input, Output, State
+import requests
 import os
 import time
 import datetime
@@ -19,26 +20,27 @@ server = app.server  # Use the underlying Flask server instance in Dash
 app.layout = html.Div(children=[
     html.H3(children="Grid Size", style={"display": "flex", "align-items": "center", "justify-content": "center"}),
     dcc.Slider(id="size-slider", marks={i: '{}'.format(i) for i in range(51)}, min=2, max=50, value=2),
+    html.Div(id="hidden-div", style={"display": "none"}),
     html.Br(),
     html.Div(html.Button("Solve", id="solve-btn"), style={"display": "flex", "align-items": "center", "justify-content": "center"}),
-    html.H2(id="solution", children="Solution: "),
-    html.Div(id="hidden-div", style={"display": "none"})
+    html.H1(id="solution", children="Solution: ", style={"display": "flex", "align-items": "center", "justify-content": "center"}),
+    html.H6(id="grid-string", style={"display": "none"}),
+    html.Br()
 ])
 
-# TODO: Turn these into client-side callbacks to reduce overhead on server
 # Bind a client-side callback to the Slider to dynamically create nodes/buttons
 app.clientside_callback(
     """
     function(size, data) {
-        grid = document.getElementById("grid");
+        var grid = document.getElementById("grid");
         if(grid != null) {
             grid.remove();
         }
         
         var div = document.createElement("div");
-        div.id = "grid"
+        div.id = "grid";
         div.align = "center";
-        
+
         for (var i = 0; i < size ; i++) {
             for(var j = 0; j < size; j++) {
                 var elem = document.createElement("input");
@@ -66,11 +68,49 @@ app.clientside_callback(
     [Input(component_id="size-slider", component_property="value")]
 )
 
-# @app.callback(
-#     Output(component_id="solution", component_property="children"),
-#     [Input(component_id="solve-btn", component_property="n_clicks")])
-# def solve(n_clicks):
-#     return solve_grid()
+app.clientside_callback(
+    """
+    function(n_clicks, size) {
+        if(n_clicks != null) {
+            var nodes = document.getElementById("grid").getElementsByTagName("input");
+            str = ""
+            
+            for(i = 0; i < nodes.length; i++)
+            {
+                str += nodes[i].value;
+            }
+            
+            return str;
+        }
+    }
+    """,
+    Output(component_id="grid-string", component_property="children"),
+    [Input(component_id="solve-btn", component_property="n_clicks")],
+    [State(component_id="size-slider", component_property="value")]
+)
+
+@app.callback(
+    Output(component_id="solution", component_property="children"),
+    [Input(component_id="grid-string", component_property="children")],
+    [State(component_id="size-slider", component_property="value"),
+     State(component_id="solve-btn", component_property="n_clicks")]
+)
+def solve(grid_string, size, n_clicks):
+    if n_clicks is not None:
+        grid = []
+        row = []
+        count = 0
+        for i in range(size ** 2):
+            count += 1
+            row.append(grid_string[i])
+
+            if count % size == 0:
+                grid.append(row)
+                row = []
+                count = 0
+
+        ans = requests.post(url="http://127.0.0.1:8050/solve", json={"n": size, "grid": grid})
+        return str(ans.json())
 
 
 # Initialize the SQLite Database
