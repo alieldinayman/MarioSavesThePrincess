@@ -13,25 +13,40 @@ import datetime
 from grid_solver import GridSolver
 
 # Initialize the Dash web app
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash("Mario Saves The Princess", title="Mario Saves the Princess")
+app = dash.Dash(__name__, title="Mario Saves the Princess")
 server = app.server  # Use the underlying Flask server instance in Dash
 
 app.layout = html.Div(children=[
+    html.Div([html.H2("Mario Saves the Princess - An A* Pathfinder"), html.Img(src="/assets/python-mario.png")],
+             className="banner"),
     html.H3(children="Grid Size", style={"display": "flex", "align-items": "center", "justify-content": "center"}),
     dcc.Slider(id="size-slider", marks={i: '{}'.format(i) for i in range(51)}, min=2, max=50, value=2),
     html.Div(id="hidden-div", style={"display": "none"}),
     html.Br(),
-    html.Div(html.Button("Solve", id="solve-btn"), style={"display": "flex", "align-items": "center", "justify-content": "center"}),
-    html.H1(id="solution", children="Solution: ", style={"display": "flex", "align-items": "center", "justify-content": "center"}),
+    html.Div([html.Button("Solve", id="solve-btn", className="button-primary", style={"background-color": "rgb(154,205,50"}),
+             html.Button("Clear", id="clear-btn", className="button-primary", style={"background-color": "rgb(250, 128, 114)"})],
+             style={"display": "flex", "align-items": "center", "justify-content": "center"}),
+    html.Br(),
+    html.H4(id="solution", style={"display": "flex", "align-items": "center", "justify-content": "center"}),
     html.H6(id="grid-string", style={"display": "none"}),
-    html.Br()
+    html.Br(),
+    html.Div([html.H6("- = Empty,", style={"display": "inline", "margin-right": "5px", "color": "rgb(169,169,169)"}),
+    html.H6("X = Obstacle,\t", style={"display": "inline", "margin-right": "5px", "color": "rgb(255,69,0)"}, ),
+    html.H6("M = Mario/Start,\t", style={"display": "inline", "margin-right": "5px", "color": "rgb(65,105,225)"}),
+    html.H6("P = Princess/Goal\t", style={"display": "inline", "margin-right": "5px", "color": "rgb(154,205,50"})],
+             style={"display": "flex", "align-items": "center", "justify-content": "center"})
+
 ])
 
 # Bind a client-side callback to the Slider to dynamically create nodes/buttons
 app.clientside_callback(
     """
-    function(size, data) {
+    function(size, n_clicks) {
+        var solution = document.getElementById("solution");
+        if (solution != null) {
+            solution.style.display = "none";
+        }
+        
         var grid = document.getElementById("grid");
         if(grid != null) {
             grid.remove();
@@ -44,15 +59,18 @@ app.clientside_callback(
         for (var i = 0; i < size ; i++) {
             for(var j = 0; j < size; j++) {
                 var elem = document.createElement("input");
+                elem.type = "button"
                 elem.id = "node_" + i + "_" + j;
-                elem.index = "node_" + i + "_" + j;
-                elem.type = "button";
                 elem.value = "-";
+                elem.style.backgroundColor = "#F5FFFA";
+                elem.style.width = "25px"
+                elem.style.height = "25px"
+                elem.style.fontSize = "20px";
                 elem.onclick = function() {
-                    if(this.value == "-") this.value = "x";
-                    else if (this.value == "x") this.value = "m"
-                    else if (this.value == "m") this.value = "p"
-                    else if (this.value == "p") this.value = "-"
+                    if(this.value == "-") { this.value = "x"; this.style.backgroundColor = "#FF4500"; }
+                    else if (this.value == "x") { this.value = "m"; this.style.backgroundColor = "#4169E1"; }
+                    else if (this.value == "m") { this.value = "p"; this.style.backgroundColor = "#ADFF2F"; }
+                    else if (this.value == "p") { this.value = "-"; this.style.backgroundColor = "#F5FFFA"; }
                 }
 
                 div.appendChild(elem);
@@ -65,13 +83,18 @@ app.clientside_callback(
     }
     """,
     Output(component_id="hidden-div", component_property="children"),
-    [Input(component_id="size-slider", component_property="value")]
+    [Input(component_id="size-slider", component_property="value"),
+     Input(component_id="clear-btn", component_property="n_clicks")]
 )
 
 app.clientside_callback(
     """
-    function(n_clicks, size) {
+    function(n_clicks, size) {        
         if(n_clicks != null) {
+            var solution = document.getElementById("solution");
+            if (solution != null) {
+                solution.style.display = "flex";
+            }
             var nodes = document.getElementById("grid").getElementsByTagName("input");
             str = ""
             
@@ -110,7 +133,7 @@ def solve(grid_string, size, n_clicks):
                 count = 0
 
         ans = requests.post(url="http://127.0.0.1:8050/solve", json={"n": size, "grid": grid})
-        return str(ans.json())
+        return "API Output: " + str(ans.json())
 
 
 # Initialize the SQLite Database

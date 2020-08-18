@@ -28,6 +28,10 @@ class GridInitializer:
 
             self.grid.data.append(row_nodes)
 
+        # Validate that the grid has a start and goal (Mario and Princess)
+        if self.grid.start is None or self.grid.goal is None:
+            return None, True
+
         return self.grid, False
 
     def initialize_node(self, coordinates, symbol):
