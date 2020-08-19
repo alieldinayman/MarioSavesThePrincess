@@ -2,7 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 layout = html.Div(children=[
-    html.Div([html.Img(src="/assets/python-mario.png"), html.H2("Mario Saves the Princess - An A* Pathfinder")],
+    html.A([html.Img(src="/assets/python-mario.png")], href='https://github.com/alieldinayman/MarioSavesThePrincess/',
              className="banner", style={"display": "flex", "align-items": "center", "justify-content": "center"}),
     html.H3(children="Grid Size", style={"display": "flex", "align-items": "center", "justify-content": "center"}),
     dcc.Slider(id="size-slider", marks={i: '{}'.format(i) for i in range(51)}, min=2, max=50, value=2),

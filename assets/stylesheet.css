@@ -1,5 +1,5 @@
 .banner {
-    height: 100px;
+    height: 120px;
     margin: 20px -8px 10px;
     background-color: rgb(250, 128, 114);
     border-radius: 2px;
@@ -12,7 +12,7 @@
 }
 
 .banner Img {
-    height: 90px;
+    height: 110px;
     margin-right: 2%
 }
 
