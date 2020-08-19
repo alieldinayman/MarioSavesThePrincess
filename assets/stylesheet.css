@@ -5,17 +5,15 @@
     border-radius: 2px;
 }
 
-.banner h2{
+.banner h2 {
     color: white;
     padding-top: 10px;
     display: inline-block;
-    margin-left: 9%
 }
 
-.banner Img{
-    float: left;
-    height: 100px;
-    margin-left: 20%
+.banner Img {
+    height: 90px;
+    margin-right: 2%
 }
 
 /* Table of contents
