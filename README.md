@@ -1,7 +1,5 @@
-# Mario Saves The Princess - An A* Pathfinder
-
 <p align="center">
-  <img src="https://github.com/alieldinayman/MarioSavesThePrincess/blob/master/assets/python-mario.png?raw=true" height="200">
+  <img src="https://github.com/alieldinayman/MarioSavesThePrincess/blob/master/assets/python-mario.png?raw=true">
 </p>
 
 Mario Saves the Princess is a Dash web app that is designed to solve any grid by finding the shortest path between a start and goal nodes (Mario and the Princess).
