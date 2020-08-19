@@ -1,4 +1,5 @@
 from dash.dependencies import Input, Output, State
+from flask import request
 import requests
 
 
@@ -101,5 +102,5 @@ def register_callbacks(app):
                     row = []
                     count = 0
 
-            ans = requests.post(url="http://127.0.0.1:8050/solve", json={"n": size, "grid": grid})
+            ans = requests.post(url=request.host_url + "/solve", json={"n": size, "grid": grid})
             return "API Output: " + str(ans.json())
