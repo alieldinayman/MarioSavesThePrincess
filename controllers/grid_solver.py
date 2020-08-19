@@ -1,5 +1,5 @@
-from node import NodeState
-from grid_initializer import GridInitializer
+from controllers.node import NodeState
+from controllers.grid_initializer import GridInitializer
 
 
 class GridSolver:
@@ -9,6 +9,7 @@ class GridSolver:
         self.closed = []
         self.show_costs = False
 
+    # Initializes a valid Grid instance and starts traversing it
     def solve_grid(self, n, data):
         grid_initializer = GridInitializer(n)
         self.grid, error_flag = grid_initializer.populate_grid(data)
@@ -19,17 +20,20 @@ class GridSolver:
         else:
             return self.traverse_grid()
 
+    # Use the A* pathfinding algorithm to find the shortest path from Mario to the Princess
     def traverse_grid(self):
-        # Seed the solver's open list with the start node
         start = self.grid.start
         goal = self.grid.goal
 
+        # Initialize the initial costs of the start node (Mario)
         start.g_cost = 0
         start.h_cost = ((start.position[0] - goal.position[0]) ** 2) + ((start.position[1] - goal.position[1]) ** 2)
         start.f_cost = start.g_cost + start.h_cost
 
+        # Seed the solver's open list with the start node
         self.open.append(start)
 
+        # A* Algorithm
         while len(self.open) > 0:
             current = min(self.open, key=lambda n: n.f_cost)
 
@@ -50,6 +54,7 @@ class GridSolver:
 
         return None, True
 
+    # Returns all the existing neighbour nodes of a specified node
     def get_valid_neighbours(self, node):
         valid_neighbours = []
 
@@ -72,6 +77,7 @@ class GridSolver:
 
         return valid_neighbours
 
+    # Retraces the shortest path found to the goal
     def get_shortest_path(self, goal):
         node = goal
         paths = []

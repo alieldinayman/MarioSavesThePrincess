@@ -10,7 +10,6 @@ class NodeState(Enum):
 
 
 class Node:
-
     def __init__(self, position, state):
         self.position = position
         self.state = state
@@ -19,6 +18,7 @@ class Node:
         self.h_cost = None
         self.f_cost = None
 
+    # Updates the node's costs whenever the node is approached by a new parent
     def update_costs(self, potential_parent, goal):
         if potential_parent is None:
             self.parent = potential_parent
@@ -28,9 +28,8 @@ class Node:
         new_h_cost = math.sqrt((self.position[0] - goal.position[0]) ** 2 + (self.position[1] - goal.position[1]) ** 2)
         new_f_cost = new_g_cost + new_h_cost
 
+        # Set the f_cost to a new value if it is null or if the new value is bigger than the current value
         if (self.f_cost is None) or (new_f_cost < self.f_cost):
-            # or \
-            # ((new_f_cost == self.f_cost) and (new_h_cost < self.h_cost)):
             self.g_cost = new_g_cost
             self.f_cost = new_f_cost
             self.parent = potential_parent

@@ -1,6 +1,8 @@
-from grid_solver import *
+from controllers.grid_solver import GridSolver
 import sys
 
+
+# The console runner module allows for running/debugging the backend logic without communicating with the server/web app
 if __name__ == "__main__":
 
     while True:
@@ -16,9 +18,11 @@ if __name__ == "__main__":
     print("Please insert your grid row by row separating each node by a space: ")
     grid = []
 
+    # Split the input grid into n rows
     for i in range(n):
         grid.append(input().split())
 
+    # Call the grid solver class to validate and solve the grid
     grid_solver = GridSolver()
     paths, error_flag = grid_solver.solve_grid(n, grid)
 

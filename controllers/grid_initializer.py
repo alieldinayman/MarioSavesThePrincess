@@ -1,5 +1,5 @@
-from grid import Grid
-from node import *
+from controllers.grid import Grid
+from controllers.node import Node, NodeState
 
 
 class GridInitializer:
@@ -7,22 +7,25 @@ class GridInitializer:
         self.grid = Grid()
         self.grid.size = n
 
+    # Validates the input data and populates a Grid instance with it
     def populate_grid(self, data):
+        # Validate that the number of rows from the input is equal to n
         if len(data) != self.grid.size:
-            return None, True
+            return self.raise_error_flag()
 
         for i in range(self.grid.size):
             row = data[i]
             row_nodes = []
 
+            # Validate that the number of nodes in the row is equal to n
             if len(row) != self.grid.size:
-                return None, True
+                return self.raise_error_flag()
 
             for j in range(self.grid.size):
                 node, error_flag = self.initialize_node([i, j], row[j])
 
                 if error_flag is True:
-                    return None, error_flag
+                    return self.raise_error_flag()
 
                 row_nodes.append(node)
 
@@ -30,7 +33,7 @@ class GridInitializer:
 
         # Validate that the grid has a start and goal (Mario and Princess)
         if self.grid.start is None or self.grid.goal is None:
-            return None, True
+            return self.raise_error_flag()
 
         return self.grid, False
 
@@ -39,6 +42,7 @@ class GridInitializer:
             node = Node(coordinates, NodeState.EMPTY)
         elif symbol == 'x':
             node = Node(coordinates, NodeState.OBSTACLE)
+
         elif symbol == 'm':
             node = Node(coordinates, NodeState.START)
 
@@ -46,7 +50,7 @@ class GridInitializer:
             if self.grid.start is None:
                 self.grid.start = node
             else:
-                return None, True
+                return self.raise_error_flag()
 
         elif symbol == 'p':
             node = Node(coordinates, NodeState.GOAL)
@@ -55,9 +59,14 @@ class GridInitializer:
             if self.grid.goal is None:
                 self.grid.goal = node
             else:
-                return None, True
+                return self.raise_error_flag()
 
+        # Invalid symbol
         else:
-            return None, True
+            return self.raise_error_flag()
 
+        # Return the node if there were no issues
         return node, False
+
+    def raise_error_flag(self):
+        return None, True
